@@ -4,6 +4,7 @@
 *.obj
 *.elf
 **/Debug
+**/.vs
 
 # Precompiled Headers
 *.gch
