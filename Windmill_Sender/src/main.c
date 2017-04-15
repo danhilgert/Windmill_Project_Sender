@@ -14,6 +14,7 @@
  #include "sys.h"
  #include "adc_app.h"
  #include "wireless_app.h"
+ #include "timer_app.h"
  #include "asf.h"
  #if SAMD || SAMR21 || SAML21
  #include "system.h"
@@ -25,38 +26,32 @@
 
  int main(void)
  {
-	 //irq_initialize_vectors();
+	irq_initialize_vectors();
 
-	 system_init();
-	 delay_init();
+	system_init();
+	delay_init();
+	timer_app_init();
+	adc_app_int();
+	usart_app_printf_init ();
+	system_interrupt_enable_global();
+	//configure_port_pins();
+	SYS_Init();
+	timer_app_set(THIRTY_SEC, THIRTY_SEC_COUNT);
+	cpu_irq_enable();
+	LED_On(LED0);
+	printf("System Running!\r\n");
+	while (1) 
+	{
+		SYS_TaskHandler();
+		APP_TaskHandler();
+		adc_app_service();
+		timer_app_service();
+		
+		if(!timer_app_get_timer(THIRTY_SEC))
+		{
+			timer_app_set(THIRTY_SEC, THIRTY_SEC_COUNT);
+			wireless_app_set_data(adc_app_get_value());
+		}
+	}
 
-	 adc_app_int();
-	 system_interrupt_enable_global();
-	 usart_app_printf_init ();
-	 printf("System Running!");
-	 //configure_port_pins();
-	 SYS_Init();
-	 //sio2host_init();
-	 cpu_irq_enable();
-	 LED_On(LED0);
-	 while (1) {
-		 SYS_TaskHandler();
-		 APP_TaskHandler();
-		 //! [start_adc_job]
-		 
-		 while (adc_app_get_flag() == true)
-		 {
-			uint32_t adc_accumulated = 0;
-			 adc_app_reset_flag();
-			 uint8_t i;
-			 for(i = 0; i < ADC_SAMPLES; i++)
-			 {
-				 adc_accumulated += adc_result_buffer[i];
-
-			 }
-			 adc_accumulated = adc_accumulated >> 4;
-			 wireless_app_set_data(adc_accumulated);
-		 }
-	 }
-
- }
+}
