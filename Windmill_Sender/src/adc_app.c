@@ -11,6 +11,8 @@
  void configure_adc_callbacks(void);
  void adc_complete_callback(struct adc_module *const module);
 
+  uint16_t adc_value = 0;
+
  //! [module_inst]
  struct adc_module adc_instance;
  //! [module_inst]
@@ -81,4 +83,9 @@ void adc_app_service(void)
 		adc_app_reset_flag ();
 	}
 	
+}
+
+uint16_t adc_app_get_value(void)
+{
+	return adc_value;
 }
