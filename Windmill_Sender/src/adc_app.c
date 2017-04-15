@@ -65,3 +65,20 @@
 	adc_read_done = 0;
 	adc_read_buffer_job(&adc_instance, adc_result_buffer, ADC_SAMPLES);
   }
+
+void adc_app_service(void)
+{
+	if(adc_app_get_flag())
+	{
+		uint32_t adc_accumulated = 0;
+		uint16_t i;
+		for(i = 0; i < ADC_SAMPLES; i++)
+		{
+			adc_accumulated += adc_result_buffer[i];
+
+		}
+		adc_value = adc_accumulated >> 8;
+		adc_app_reset_flag ();
+	}
+	
+}
