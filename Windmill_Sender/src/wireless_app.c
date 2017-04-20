@@ -58,6 +58,7 @@
 #include "asf.h"
 #include "adc_app.h"
 #include "wireless_app.h"
+#include "freq_measure_app.h"
 
 /*- Definitions ------------------------------------------------------------*/
 #ifdef NWK_ENABLE_SECURITY
@@ -107,13 +108,14 @@ static void appSendData(void)
 	}
 
 	memcpy(appDataReqBuffer, appUartBuffer, appUartBufferPtr);
+	/*
 	printf("Transmit Raw\r\n");
 	uint8_t i;
 	for(i = 0; i < appUartBufferPtr; i++)
 	{
 		printf(" %02X \r\n",appUartBuffer[i]);
 	}
-	
+	*/
 	appDataReq.dstAddr = 1 - APP_ADDR;
 	appDataReq.dstEndpoint = APP_ENDPOINT;
 	appDataReq.srcEndpoint = APP_ENDPOINT;
@@ -230,11 +232,12 @@ void wireless_app_set_length (uint8_t length)
 
 void wireless_app_set_data (uint16_t adc_accumulated)
 {
+	uint16_t temp;
+	temp = freq_measure_app_get_pulse_width();
 	 rx_data[0] = adc_accumulated;
 	 rx_data[1] = adc_accumulated >> 8;
-	 rx_data[2] = '\n';
-	 rx_data[3] = '\r';
-	
+	 rx_data[2] = temp;
+	 rx_data[3] = temp >> 8;
 	 sio_rx_length = 4;
 }
 
