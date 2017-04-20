@@ -13,6 +13,8 @@
  #include "config.h"
  #include "sys.h"
  #include "adc_app.h"
+ #include "input_capture.h"
+ #include "freq_measure_app.h"
  #include "wireless_app.h"
  #include "timer_app.h"
  #include "asf.h"
@@ -26,22 +28,24 @@
 
  int main(void)
  {
-	irq_initialize_vectors();
-
+ 	irq_initialize_vectors();
 	system_init();
 	delay_init();
 	timer_app_init();
 	adc_app_int();
-	usart_app_printf_init ();
-	system_interrupt_enable_global();
+	freq_measure_app_init();
+	//input_capture_config();
 	//configure_port_pins();
 	SYS_Init();
 	timer_app_set(THIRTY_SEC, THIRTY_SEC_COUNT);
-	cpu_irq_enable();
+	//usart_app_printf_init();
+	system_interrupt_enable_global();
+	//cpu_irq_enable();
 	LED_On(LED0);
-	printf("System Running!\r\n");
+	//printf("System Running!\r\n");
 	while (1) 
 	{
+
 		SYS_TaskHandler();
 		APP_TaskHandler();
 		adc_app_service();
